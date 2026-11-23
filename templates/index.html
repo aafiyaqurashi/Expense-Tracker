@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Expense Tracker</h1>
+    <p class="subtitle">Manage your daily expenses easily</p>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+
+        <div class="summary-card total-card">
+            <h3>All Time Expenses</h3>
+            <h2>₹ {{ "%.2f"|format(total) }}</h2>
+        </div>
+
+        <div class="summary-card monthly-card">
+            <h3>This Month's Expenses</h3>
+            <h2>₹ {{ "%.2f"|format(monthly_total) }}</h2>
+        </div>
+
+    </div>
+
+    <!-- Add Expense -->
+    <div class="form-box">
+        <h2>Add New Expense</h2>
+
+        <form action="/add" method="POST">
+
+            <input type="text" name="title"
+                   placeholder="Expense Name" required>
+
+            <input type="number" name="amount"
+                   placeholder="Amount (₹)"
+                   step="0.01" min="0.01" required>
+
+            <select name="category" required>
+                <option value="">Select Category</option>
+                <option>Food</option>
+                <option>Travel</option>
+                <option>Shopping</option>
+                <option>Education</option>
+                <option>Other</option>
+            </select>
+
+            <input type="date" name="date" required>
+
+            <button type="submit">Add Expense</button>
+
+        </form>
+    </div>
+
+    <!-- Category Summary -->
+    <div class="expense-box">
+        <h2>This Month's Category Breakdown</h2>
+
+        {% if category_totals %}
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Total Amount</th>
+            </tr>
+
+            {% for item in category_totals %}
+            <tr>
+                <td>{{ item.category }}</td>
+                <td>₹ {{ "%.2f"|format(item.amount) }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% else %}
+        <p class="empty">No expenses recorded this month.</p>
+        {% endif %}
+    </div>
+
+    <!-- Expense History -->
+    <div class="expense-box">
+        <h2>Expense History</h2>
+
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.title }}</td>
+                <td>₹ {{ "%.2f"|format(expense.amount) }}</td>
+                <td>{{ expense.category }}</td>
+                <td>{{ expense.date }}</td>
+                <td>
+                    <a class="delete"
+                       href="/delete/{{ expense.id }}"
+                       onclick="return confirm('Delete this expense?')">
+                       Delete
+                    </a>
+                </td>
+            </tr>
+
+            {% else %}
+            <tr>
+                <td colspan="5">No expenses added yet.</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>
